@@ -14,13 +14,12 @@ class Matrix
 end
 
 def mat
-	num2id		= Array[]
-	num2name 	= Array[]
 	car			= Array[]
 	pr 			= Array[]
 	tpr			= Array[]
-	h = Hash.new
 
+	num2id = Hash.new
+	id2title = Hash.new
 
 	continue = 1
 	threshold = 0.0001
@@ -35,8 +34,8 @@ def mat
 			t = line.encode("UTF-16BE", :invalid=>:replace,:undef=>:replace,:replace=>'').encode("UTF-8")
 			tt = t.split(",")
 
-			num2id << tt[0]
-			h[tt[1].gsub("\n","")] = tt[0]
+			num2id[tt[0]] = c
+			id2title[tt[1].gsub("\n","")] = tt[0]
 
 			c+=1
 
@@ -51,42 +50,27 @@ def mat
 	end
 
 	p "definning matrix"
-	m = Matrix.scalar(h.size-1,0)
+	m = Matrix.scalar(num2id.size,0)
+	#でかすぎ
+	
 
 	p "making matrix"
-	fpl = open("parsepagelink2.txt","r:utf-8")do |fpl|
+	fpl = open("parsepagelinks3.txt","r:utf-8")do |fpl|
 		while line = fpl.gets
 			t = line.encode("UTF-16BE", :invalid=>:replace,:undef=>:replace,:replace=>'').encode("UTF-8")
 
-			tt = t.split(",")
-
-			#detect gyou
-			n = tt[0]
-			l = 0
-			h = num2id.size-1
-			mid = 0
-
-			pos = -1
-			while l<=h do
-				mid = (l+h)/2
-				if num2id[m]==n then
-					pos = mid
-					break
-				elsif aa[m]>n then
-					h = mid-1
-				elsif aa[m]<n then
-					l = mid+1
-				end
-			end
-
+			link = t.split(",")
+			
+			#detect page id
+			r = num2id[link[0]].to_i
 			
 			#detect retsu
-			s = tt[1]
-			m[pos,num2id[h[s]]]=1
-			
+			h = num2id[id2title[link[1].gsub("\n","")].to_s].to_i
 
+			m[r,h]=1
 		end
 	end
+
 
 	p "making prepare matrix"
 	for i in 0..m.column_size-1 do
@@ -99,11 +83,22 @@ def mat
 		end
 	end
 
-	p car
+
+	p "writing prepared matrix"
+	f = open("matrix.txt","w")do |f|
+		for i in 0..m.column_size-1 do
+			t = m.row(i).to_s.gsub("Vector[","")
+			t.gsub!("]","")
+			t.gsub!(" ","")
+			
+			f.write(t)
+			f.write("\n")
+		end	
+	end
 
 	switch=0
 
-	p "detecting pagerank"
+	p "detecting pagerank(1)"
 	for i in 0..m.column_size-1 do
 		ary = m.row(i)
 		s=0
@@ -116,14 +111,11 @@ def mat
 	end
 
 #doudesyou
+	p "reversing"
 	m = m.t
 
-	i=0
-	until i==6
-		p pr[i]
-		i += 1
-	end
 
+	p "detecting pagerank(2)"
 	while true
 		running_counter+=1
 		p running_counter
@@ -175,10 +167,17 @@ def mat
 			break
 		end
 
+
+		f = open("result.txt","w")do |f|
+			for i in 0..pr.size-1 do
+				f.write(pr[i])
+				f.write("\n")
+			end	
+		end
+
 	end
 	p "finished detect pagerank"
-
-	p pr
+	
 end
 
 
