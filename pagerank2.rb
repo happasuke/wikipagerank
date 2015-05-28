@@ -27,7 +27,7 @@ def mat
 	running_counter=0
 
 	#1 minute
-	p "making num2id"
+	p "making num2id hash table"
 	fp = open("parsepage4.txt","r:UTF-8")do |fp|
 		c=0
 		while line = fp.gets
@@ -49,12 +49,12 @@ def mat
 		end
 	end
 
-	p "definning matrix"
+	p "make void matrix"
 	m = Matrix.scalar(num2id.size,0)
 	#でかすぎ
 	
 
-	p "making matrix"
+	p "detecting page link"
 	fpl = open("parsepagelinks3.txt","r:utf-8")do |fpl|
 		while line = fpl.gets
 			t = line.encode("UTF-16BE", :invalid=>:replace,:undef=>:replace,:replace=>'').encode("UTF-8")
@@ -72,7 +72,7 @@ def mat
 	end
 
 
-	p "making prepare matrix"
+	p "counting linked page number"
 	for i in 0..m.column_size-1 do
 		ary = m.row(i)
 		t = ary.inject(:+)
