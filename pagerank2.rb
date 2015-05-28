@@ -1,8 +1,3 @@
-#
-# page 51 ~ 2758850
-#
-# page links 40 ~ 
-#
 
 require 'matrix'
 
@@ -51,8 +46,6 @@ def mat
 
 	p "make void matrix"
 	m = Matrix.scalar(num2id.size,0)
-	#でかすぎ
-	
 
 	p "detecting page link"
 	fpl = open("parsepagelinks3.txt","r:utf-8")do |fpl|
@@ -110,10 +103,8 @@ def mat
 		pr[i]=0.15+0.85*s
 	end
 
-#doudesyou
 	p "reversing"
 	m = m.t
-
 
 	p "detecting pagerank(2)"
 	while true
